@@ -1,6 +1,9 @@
 import logging
 from typing import Optional
 
+from examples.GameServer.game_modules.game_dataaccess.dbtable.db_info import DBInfo
+from examples.GameServer.game_modules.game_dataaccess.dbtable.db_role import DBRole
+from examples.GameServer.game_modules.game_dataaccess.dbtable.db_user import DBUser
 from pkg.logger import logger
 from pkg.ymd_dataaccess.YmdDataAccessBase import YmdDataAccessBase, DataAccessInfo
 from examples.GameServer.game_modules.game_dataaccess.MysqlModule import MysqlModule
@@ -35,7 +38,7 @@ class DataAccessManager:
                 port=3306,
                 user="root",
                 password="12345678",
-                database="fever2",
+                database="fever3",
                 pool_size=30,
                 max_overflow=50,
                 pool_recycle=900,
@@ -49,8 +52,10 @@ class DataAccessManager:
         try:
             # Initialize YmdDataAccessBase
             self.dataAccess = YmdDataAccessBase(info)
-            self.dataAccess.init()
+            # 注册表自动迁移 创建表结构
+            self.dataAccess.AutoMigrate(DBUser,DBRole,DBInfo)
 
+            self.dataAccess.Connect()
             # Initialize specific modules
             self.mysqlModule = MysqlModule(self.dataAccess)
             self.redisModule = RedisModule(self.dataAccess)

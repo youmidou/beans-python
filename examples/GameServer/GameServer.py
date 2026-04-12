@@ -1,6 +1,8 @@
 import asyncio
+from enum import Enum
 
 from examples.GameServer.game_modules.game_dataaccess.DataAccessManager import DataAccessManager
+from examples._def.svc_def import GameDef, GameModule
 from pkg.app import App
 from pkg.builder import NewDefaultBuilder, Builder
 from pkg.config.config import PitayaConfig
@@ -16,7 +18,10 @@ async def main():
     logger.Log.Info("🚀 开始服务器启动完成")
     builder:Builder = NewDefaultBuilder(True, svType, "pitaya.Cluster", "serverMetadata", cfg)
     app:App = builder.Build()
-    app.RegisterModule(DataAccessManager(),"DataAccessManager")
+
+    s:Enum = GameModule.DataAccessManager
+
+    app.RegisterModule(DataAccessManager(),GameDef.DataAccessManager)
     # 默认构建器
     #task6 = asyncio.create_task(handle_timeout())
     app.Start()

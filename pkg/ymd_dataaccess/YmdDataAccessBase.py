@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Any
 
 from pkg.ymd_dataaccess.ymd_mysql.mysql_client import MysqlClient, MysqlInfo
 from pkg.ymd_dataaccess.ymd_redis.redis_client import RedisClient, RedisInfo
@@ -23,7 +23,7 @@ class YmdDataAccessBase:
         self._mysql: MysqlClient = None
         self._redis: RedisClient = None
 
-    def init(self) -> None:
+    def Connect(self) -> None:
         if self._info.mysql_info is not None:
             self._mysql = MysqlClient(self._info.mysql_info)
             self._mysql.connect()
@@ -32,10 +32,14 @@ class YmdDataAccessBase:
             self._redis = RedisClient(self._info.redis_info)
             self._redis.connect()
 
-    def get_mysql(self) -> Optional[MysqlClient]:
+    def AutoMigrate(self, *models_or_bases: Any) -> None:
+        self._mysql.AutoMigrate(*models_or_bases)
+        self._redis.AutoMigrate(*models_or_bases)
+
+    def get_mysql(self) -> MysqlClient:
         return self._mysql
 
-    def get_redis(self) -> Optional[RedisClient]:
+    def get_redis(self) -> RedisClient:
         return self._redis
 
     def close(self) -> None:
