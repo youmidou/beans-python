@@ -20,6 +20,7 @@ async def main():
     # 默认构建器
     #task6 = asyncio.create_task(handle_timeout())
     app.Start()
+    #uv add redis --upgrade
     await asyncio.sleep(3)
 
 if __name__ == "__main__":

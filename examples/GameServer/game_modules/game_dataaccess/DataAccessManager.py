@@ -42,7 +42,7 @@ class DataAccessManager:
             )
         info.redis_info = RedisInfo(
                 host="127.0.0.1",
-                port=6379,
+                port=6378,
                 db=0,
             )
 
