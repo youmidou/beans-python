@@ -12,3 +12,6 @@ class App:
     #注册服务模块
     def RegisterSvc(self, svcModuleHandle ,svcName:str):
         pass
+
+    def Start(self):
+        pass
