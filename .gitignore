@@ -1,0 +1,17 @@
+.idea/encodings.xml
+.idea/misc.xml
+.idea/phoenixServer.iml
+.idea/vcs.xml
+.idea/workspace.xml
+.idea/
+*.pyc
+*.pyo
+*.xml
+*.DS_Store
+.DS_Store
+cash_frenzy/.DS_Store
+doc/.DS_Store
+slots_math/.DS_Store
+cash_server_stack/cash_data/mysql_data/*
+cash_server_stack/cash_data/postgres
+logs/
