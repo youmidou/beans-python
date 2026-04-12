@@ -12,6 +12,6 @@
 cash_frenzy/.DS_Store
 doc/.DS_Store
 slots_math/.DS_Store
-cash_server_stack/cash_data/mysql_data/*
-cash_server_stack/cash_data/postgres
+beans_stack/beans_data/mysql_data/*
+beans_stack/beans_data/postgres
 logs/
