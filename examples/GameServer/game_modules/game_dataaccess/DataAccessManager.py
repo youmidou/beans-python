@@ -77,6 +77,12 @@ class DataAccessManager:
         except Exception as e:
             logger.Log.Error(f"DataAccessManager initialization failed: {e}")
             raise
+
+    def SetDataGameUser(self, userId: int,dataGameUser:DataGameUser,isPgsql:bool=False)->bool:
+        self.redisModule.SetDataGameUser(userId,dataGameUser)
+        if isPgsql:
+            self.postgresqlModule.SetDataGameUser(userId,dataGameUser)
+
     #获取玩家数据
     def GetDataGameUser(self,userId:int)->DataGameUser:
             data,err = self.redisModule.GetDataGameUser(userId)

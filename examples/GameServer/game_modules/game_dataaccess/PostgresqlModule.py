@@ -8,3 +8,6 @@ class PostgresqlModule:
 
     def GetDataGameUser(self,userId:int):
         self.dataAccess.get_postgresql()
+
+    def SetDataGameUser(self, userId, dataGameUser):
+        pass
