@@ -8,6 +8,8 @@ from pkg.logger import logger
 from pkg.ymd_dataaccess.YmdDataAccessBase import YmdDataAccessBase, DataAccessInfo
 from examples.GameServer.game_modules.game_dataaccess.MysqlModule import MysqlModule
 from examples.GameServer.game_modules.game_dataaccess.RedisModule import RedisModule
+
+from pkg.ymd_dataaccess.ymd_postgresql.postgresql_client import PostgresqlInfo
 from pkg.ymd_dataaccess.ymd_mysql.mysql_client import MysqlInfo
 from pkg.ymd_dataaccess.ymd_redis.redis_client import RedisInfo
 
@@ -33,21 +35,28 @@ class DataAccessManager:
     def initialize(self) -> None:
         """Initialize all data access modules"""
         info = DataAccessInfo()
-        info.mysql_info = MysqlInfo(
-                host="127.0.0.1",
-                port=3306,
-                user="root",
-                password="12345678",
-                database="fever3",
-                pool_size=30,
-                max_overflow=50,
-                pool_recycle=900,
-            )
         info.redis_info = RedisInfo(
                 host="127.0.0.1",
-                port=6378,
+                port=10000,
                 db=0,
             )
+        info.postgresql_info = PostgresqlInfo(
+            host="127.0.0.1",
+            port=10001,
+            user="postgres",
+            password="12345678",
+        )
+
+        # info.mysql_info = MysqlInfo(
+        #         host="127.0.0.1",
+        #         port=3306,
+        #         user="root",
+        #         password="12345678",
+        #         database="fever3",
+        #         pool_size=30,
+        #         max_overflow=50,
+        #         pool_recycle=900,
+        #     )
 
         try:
             # Initialize YmdDataAccessBase
