@@ -3,6 +3,9 @@ from typing import Any, List, Optional, Dict, Type
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from sqlalchemy.pool import QueuePool
+from sqlalchemy.exc import OperationalError
+import psycopg2
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 Base = declarative_base()
 
@@ -27,7 +30,10 @@ class PostgresqlClient:
         self._session_factory = None
 
     def connect(self):
-        """连接数据库"""
+        """连接数据库，如果数据库不存在则自动创建"""
+        # 先检查并创建数据库
+        self._ensure_database_exists()
+
         connection_string = (
             f"postgresql://{self._info.user}:{self._info.password}"
             f"@{self._info.host}:{self._info.port}/{self._info.database}"
@@ -44,17 +50,49 @@ class PostgresqlClient:
 
         self._session_factory = sessionmaker(bind=self._engine)
 
+    def _ensure_database_exists(self):
+        """确保数据库存在，不存在则创建"""
+        try:
+            # 连接到默认的 postgres 数据库
+            conn = psycopg2.connect(
+                host=self._info.host,
+                port=self._info.port,
+                user=self._info.user,
+                password=self._info.password,
+                database='postgres'
+            )
+            conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+            cursor = conn.cursor()
+
+            # 检查数据库是否存在
+            cursor.execute(
+                "SELECT 1 FROM pg_database WHERE datname = %s",
+                (self._info.database,)
+            )
+            exists = cursor.fetchone()
+
+            if not exists:
+                # 创建数据库
+                cursor.execute(f'CREATE DATABASE "{self._info.database}"')
+                print(f"✅ 数据库 '{self._info.database}' 创建成功")
+
+            cursor.close()
+            conn.close()
+
+        except Exception as e:
+            print(f"⚠️ 检查/创建数据库时出错: {e}")
+            raise
+
     def AutoMigrate(self, *models_or_bases: Any) -> None:
-        """自动迁移表结构"""
+        """自动迁移表结构
+
+        注意：所有模型必须继承自同一个 Base 才能正确创建表
+        参数 models_or_bases 保留用于兼容性，实际会创建所有已注册到 Base 的表
+        """
         if self._engine is None:
             raise RuntimeError("Database not connected. Call connect() first.")
 
-        # 设置表的基类
-        for model in models_or_bases:
-            if not hasattr(model, '__table__'):
-                # 动态创建表类
-                model.__bases__ = (Base,)
-
+        # 所有模型都已经继承自 Base，直接创建所有表
         Base.metadata.create_all(self._engine)
 
     def get_session(self) -> Session:

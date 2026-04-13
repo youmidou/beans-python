@@ -67,11 +67,15 @@ class DataAccessManager:
         try:
             # Initialize YmdDataAccessBase
             self.dataAccess = YmdDataAccessBase(info)
-            # 注册表自动迁移 创建表结构
-            self.dataAccess.AutoMigrate(DBUser,DBRole,DBInbox)
 
+            # 先连接数据库（会自动创建数据库）
             self.dataAccess.Connect()
             logger.Log.Info("🚀 数据库链接成功...")
+
+            # 注册表自动迁移 创建表结构
+            self.dataAccess.AutoMigrate(DBUser,DBRole,DBInbox)
+            logger.Log.Info("✅ 数据表结构创建/更新成功")
+
             # Initialize specific modules
             self.redisModule = RedisModule(self.dataAccess)
             if info.postgresql_info:

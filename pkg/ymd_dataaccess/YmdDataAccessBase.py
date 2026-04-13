@@ -37,12 +37,13 @@ class YmdDataAccessBase:
             self._redis.connect()
 
     def AutoMigrate(self, *models_or_bases: Any) -> None:
-        if self._redis != None:
-            self._redis.AutoMigrate(*models_or_bases)
+        """自动迁移表结构（必须在 Connect 之后调用）"""
         if self._postgresql != None:
             self._postgresql.AutoMigrate(*models_or_bases)
         if self._mysql != None:
             self._mysql.AutoMigrate(*models_or_bases)
+        if self._redis != None:
+            self._redis.AutoMigrate(*models_or_bases)
 
     def get_postgresql(self) -> Optional[PostgresqlClient]:
         return self._postgresql

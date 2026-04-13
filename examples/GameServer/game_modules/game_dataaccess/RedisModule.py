@@ -19,7 +19,7 @@ class RedisModule:
 
             # 将 DataGameUser 转换为字典
             data = {
-                "user_id": dataGameUser.user_id,
+                "UserId": dataGameUser.UserId,
                 "role": {
                     "UserId": dataGameUser.DBRole.UserId,
                     "NickName": dataGameUser.DBRole.NickName
@@ -51,7 +51,7 @@ class RedisModule:
             data = json.loads(value.decode('utf-8'))
 
             # 重建 DataGameUser 对象
-            gameUser = DataGameUser(data["user_id"])
+            gameUser = DataGameUser(data["UserId"])
 
             # 重建 DBRole
             gameUser.DBRole = DBRole()

@@ -1,8 +1,6 @@
 #用户信息表
 from sqlalchemy import Column, Integer
-from sqlalchemy.orm import declarative_base
-
-Base = declarative_base()
+from pkg.ymd_dataaccess.ymd_postgresql.postgresql_client import Base
 
 
 class DBUser(Base):
