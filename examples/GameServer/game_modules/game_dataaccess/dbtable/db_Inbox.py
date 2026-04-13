@@ -2,6 +2,6 @@
 from sqlalchemy import Column, Integer
 
 
-class DBInfo:
+class DBInbox:
     __tablename__ = "db_inbox"
     UserId = Column(Integer, primary_key=True)
