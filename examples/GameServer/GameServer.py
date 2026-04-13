@@ -17,16 +17,16 @@ async def main():
     svType:str ="Game"
     cfg:PitayaConfig = PitayaConfig()
     logger.Log.Info("🚀 开始服务器启动完成")
-    builder:Builder = NewDefaultBuilder(True, svType, "pitaya.Cluster", "serverMetadata", cfg)
+    builder:Builder = NewDefaultBuilder(True, svType, "pitaya.Cluster", cfg)
     app:App = builder.Build()
 
     dataAccess = DataAccessManager()
     dataAccess.initialize()
 
     dataGameUser = dataAccess.GetDataGameUser(1)
-    if dataGameUser !=None:
-        dataGameUser= NewDataGameUser(1)
-        dataAccess.SetDataGameUser(dataGameUser.UserId,dataGameUser)
+    if dataGameUser is None:
+        data = NewDataGameUser(1)
+        dataAccess.SetDataGameUser(data.UserId, data)
 
     logger.Log.Info("----------------")
 

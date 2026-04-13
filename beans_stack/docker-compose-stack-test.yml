@@ -29,10 +29,10 @@ services:  # 定义所有需要运行的服务
       - "10001:5432"
     # 核心环境变量（数据库初始化配置，无需重装自动生效）
     environment:
-      # 数据库超级管理员密码（你原来的密码，保留不变）
-      POSTGRES_PASSWORD: 12345678
       # 数据库默认用户名（默认 postgres，固定即可）
       POSTGRES_USER: postgres
+      # 数据库超级管理员密码（你原来的密码，保留不变）
+      POSTGRES_PASSWORD: 12345678
       # 初始化自动创建的数据库名（你原来的库名，保留不变）
       #POSTGRES_DB: game_db
       # 时区设置：亚洲/上海（解决时间错乱问题）

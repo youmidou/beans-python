@@ -43,13 +43,14 @@ class DataAccessManager:
                 port=10000,
                 db=0,
             )
+        # 如果需要 PostgreSQL，取消注释以下代码
         info.postgresql_info = PostgresqlInfo(
-            host="127.0.0.1",
-            port=10001,
-            user="postgres",
-            password="12345678",
-            database="gamedb",
-        )
+             host="127.0.0.1",
+             port=10001,
+             user="postgres",
+             password="12345678",
+             database="gamedb",
+         )
 
         # info.mysql_info = MysqlInfo(
         #         host="127.0.0.1",
@@ -71,7 +72,8 @@ class DataAccessManager:
             self.dataAccess.Connect()
             # Initialize specific modules
             self.redisModule = RedisModule(self.dataAccess)
-            self.postgresqlModule = PostgresqlModule(self.dataAccess)
+            if info.postgresql_info:
+                self.postgresqlModule = PostgresqlModule(self.dataAccess)
             #self.mysqlModule = MysqlModule(self.dataAccess)
             logger.Log.Info("DataAccessManager initialized successfully")
 
@@ -88,7 +90,7 @@ class DataAccessManager:
             return False
 
         # 如果需要，保存到 PostgreSQL
-        if isPgsql:
+        if isPgsql and self.postgresqlModule is not None:
             _, err = self.postgresqlModule.SetDataGameUser(userId, dataGameUser)
             if err is not None:
                 logger.Log.Error(f"SetDataGameUser to PostgreSQL failed: {err}")
@@ -104,14 +106,10 @@ class DataAccessManager:
             logger.Log.Error(f"GetDataGameUser from Redis failed: {err}")
 
         # 如果 Redis 没有数据，从 PostgreSQL 加载
-        if data is None:
+        if data is None and self.postgresqlModule is not None:
             data, err = self.postgresqlModule.GetDataGameUser(userId)
             if err is not None:
-                logger.Log.Error(f"GetDataGameUser from PostgreSQL failed: {err}")
+                #logger.Log.Error(f"GetDataGameUser from PostgreSQL failed: {err}")
                 return None
-
-            # 如果从数据库加载成功，回写到 Redis
-            if data is not None:
-                self.redisModule.SetDataGameUser(userId, data)
 
         return data
