@@ -78,21 +78,39 @@ class DataAccessManager:
             logger.Log.Error(f"DataAccessManager initialization failed: {e}")
             raise
 
-    def SetDataGameUser(self, userId: int,dataGameUser:DataGameUser,isPgsql:bool=False)->bool:
-        self.redisModule.SetDataGameUser(userId,dataGameUser)
-        if isPgsql:
-            self.postgresqlModule.SetDataGameUser(userId,dataGameUser)
+    def SetDataGameUser(self, userId: int, dataGameUser: DataGameUser, isPgsql: bool = False) -> bool:
+        """保存玩家数据"""
+        # 保存到 Redis
+        _, err = self.redisModule.SetDataGameUser(userId, dataGameUser)
+        if err is not None:
+            logger.Log.Error(f"SetDataGameUser to Redis failed: {err}")
+            return False
 
-    #获取玩家数据
-    def GetDataGameUser(self,userId:int)->DataGameUser:
-            data,err = self.redisModule.GetDataGameUser(userId)
-            if err!=None:
-                logger.Log.Error(f"DataAccessManager get data game user failed with error: {err}")
+        # 如果需要，保存到 PostgreSQL
+        if isPgsql:
+            _, err = self.postgresqlModule.SetDataGameUser(userId, dataGameUser)
+            if err is not None:
+                logger.Log.Error(f"SetDataGameUser to PostgreSQL failed: {err}")
+                return False
+
+        return True
+
+    def GetDataGameUser(self, userId: int) -> DataGameUser:
+        """获取玩家数据（优先从 Redis，缓存未命中则从 PostgreSQL 加载）"""
+        # 先从 Redis 获取
+        data, err = self.redisModule.GetDataGameUser(userId)
+        if err is not None:
+            logger.Log.Error(f"GetDataGameUser from Redis failed: {err}")
+
+        # 如果 Redis 没有数据，从 PostgreSQL 加载
+        if data is None:
+            data, err = self.postgresqlModule.GetDataGameUser(userId)
+            if err is not None:
+                logger.Log.Error(f"GetDataGameUser from PostgreSQL failed: {err}")
                 return None
 
-            if data is None:
-                data,err = self.postgresqlModule.GetDataGameUser(userId)
-                if err!=None:
-                    logger.Log.Error(f"DataAccessManager get data game user failed with error: {err}")
+            # 如果从数据库加载成功，回写到 Redis
+            if data is not None:
+                self.redisModule.SetDataGameUser(userId, data)
 
-            return data
+        return data
