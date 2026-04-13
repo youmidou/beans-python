@@ -1,6 +1,7 @@
 import logging
 from typing import Optional
 
+from examples.GameServer.game_modules.game_dataaccess.PostgresqlModule import PostgresqlModule
 from examples.GameServer.game_modules.game_dataaccess.dbtable.db_info import DBInfo
 from examples.GameServer.game_modules.game_dataaccess.dbtable.db_role import DBRole
 from examples.GameServer.game_modules.game_dataaccess.dbtable.db_user import DBUser
@@ -68,6 +69,8 @@ class DataAccessManager:
             # Initialize specific modules
             self.mysqlModule = MysqlModule(self.dataAccess)
             self.redisModule = RedisModule(self.dataAccess)
+            self.postgresqlModule = PostgresqlModule(self.dataAccess)
+
             self.is_initialized = True
             logger.Log.Info("DataAccessManager initialized successfully")
 

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
@@ -15,6 +16,9 @@ class PostgresqlClient:
         pass
 
     def connect(self):
+        pass
+
+    def AutoMigrate(self, *models_or_bases: Any) -> None:
         pass
 
     def close(self):

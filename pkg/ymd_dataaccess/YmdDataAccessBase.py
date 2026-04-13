@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Any
 
 from pkg.logger import logger
 from pkg.ymd_dataaccess.ymd_mysql.mysql_client import MysqlClient, MysqlInfo
@@ -15,13 +15,14 @@ class DataAccessInfo:
 
 
 class YmdDataAccessBase:
+    _redis: RedisClient = None
     _postgresql: PostgresqlClient = None
     _mysql: MysqlClient = None
-    _redis: RedisClient = None
+
     def __init__(self, info: DataAccessInfo):
         self._info = info
 
-    def init(self) -> None:
+    def Connect(self) -> None:
         logger.Log.info("YmdDataAccessBase.__init__")
         if self._info.postgresql_info is not None:
             self._postgresql = PostgresqlClient(self._info.postgresql_info)
@@ -34,6 +35,13 @@ class YmdDataAccessBase:
         if self._info.redis_info is not None:
             self._redis = RedisClient(self._info.redis_info)
             self._redis.connect()
+
+    def AutoMigrate(self, *models_or_bases: Any) -> None:
+        if self._redis != None:
+            self._redis.AutoMigrate(*models_or_bases)
+        if self._postgresql != None:
+            self._postgresql.AutoMigrate(*models_or_bases)
+        self._mysql.AutoMigrate(*models_or_bases)
 
     def get_postgresql(self) -> Optional[PostgresqlClient]:
         return self._postgresql
