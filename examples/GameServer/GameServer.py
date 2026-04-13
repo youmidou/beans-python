@@ -2,6 +2,7 @@ import asyncio
 from enum import Enum
 
 from examples.GameServer.game_modules.game_dataaccess.DataAccessManager import DataAccessManager
+from examples.GameServer.game_modules.game_dataaccess.dbtable.DataGameUser import NewDataGameUser
 from examples._def.svc_def import GameDef, GameModule
 from pkg.app import App
 from pkg.builder import NewDefaultBuilder, Builder
@@ -19,9 +20,17 @@ async def main():
     builder:Builder = NewDefaultBuilder(True, svType, "pitaya.Cluster", "serverMetadata", cfg)
     app:App = builder.Build()
 
-    s:Enum = GameModule.DataAccessManager
+    dataAccess = DataAccessManager()
+    dataAccess.initialize()
 
-    app.RegisterModule(DataAccessManager(),GameDef.DataAccessManager)
+    dataGameUser = dataAccess.GetDataGameUser(1)
+    if dataGameUser !=None:
+        dataGameUser= NewDataGameUser(1)
+        dataAccess.SetDataGameUser(dataGameUser.UserId,dataGameUser)
+
+    logger.Log.Info("----------------")
+
+    #app.RegisterModule(DataAccessManager(),"DataAccessManager")
     # 默认构建器
     #task6 = asyncio.create_task(handle_timeout())
     app.Start()

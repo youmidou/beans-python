@@ -4,8 +4,8 @@ from examples.GameServer.game_modules.game_dataaccess.dbtable.db_role import DBR
 
 class DataGameUser:
 
-    def __init__(self,user_id:int):
-        self.user_id = user_id
+    def __init__(self,userId:int):
+        self.UserId = userId
         self.DBRole:DBRole
         self.DBInbox:DBInbox
 
