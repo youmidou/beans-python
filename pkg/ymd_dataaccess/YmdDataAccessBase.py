@@ -23,7 +23,7 @@ class YmdDataAccessBase:
         self._info = info
 
     def Connect(self) -> None:
-        logger.Log.info("YmdDataAccessBase.__init__")
+        logger.Log.Info("YmdDataAccessBase.__init__")
         if self._info.postgresql_info is not None:
             self._postgresql = PostgresqlClient(self._info.postgresql_info)
             self._postgresql.connect()
@@ -41,7 +41,8 @@ class YmdDataAccessBase:
             self._redis.AutoMigrate(*models_or_bases)
         if self._postgresql != None:
             self._postgresql.AutoMigrate(*models_or_bases)
-        self._mysql.AutoMigrate(*models_or_bases)
+        if self._mysql != None:
+            self._mysql.AutoMigrate(*models_or_bases)
 
     def get_postgresql(self) -> Optional[PostgresqlClient]:
         return self._postgresql

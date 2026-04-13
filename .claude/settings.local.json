@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python examples/GameServer/test_dataaccess.py)",
+      "Bash(python3 examples/GameServer/test_dataaccess.py)",
+      "Bash(pip3 install:*)",
+      "Bash(uv run:*)"
+    ]
+  }
+}

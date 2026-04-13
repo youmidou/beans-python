@@ -48,6 +48,7 @@ class DataAccessManager:
             port=10001,
             user="postgres",
             password="12345678",
+            database="gamedb",
         )
 
         # info.mysql_info = MysqlInfo(
