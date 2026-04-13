@@ -37,6 +37,7 @@ class DataAccessManager:
 
     def initialize(self) -> None:
         """Initialize all data access modules"""
+        logger.Log.Info("🚀 初始化数据库...")
         info = DataAccessInfo()
         info.redis_info = RedisInfo(
                 host="127.0.0.1",
@@ -70,6 +71,7 @@ class DataAccessManager:
             self.dataAccess.AutoMigrate(DBUser,DBRole,DBInbox)
 
             self.dataAccess.Connect()
+            logger.Log.Info("🚀 数据库链接成功...")
             # Initialize specific modules
             self.redisModule = RedisModule(self.dataAccess)
             if info.postgresql_info:

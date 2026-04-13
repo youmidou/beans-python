@@ -23,7 +23,7 @@ class YmdDataAccessBase:
         self._info = info
 
     def Connect(self) -> None:
-        logger.Log.Info("YmdDataAccessBase.__init__")
+        logger.Log.Info("🚀 链接数据库...")
         if self._info.postgresql_info is not None:
             self._postgresql = PostgresqlClient(self._info.postgresql_info)
             self._postgresql.connect()
