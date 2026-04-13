@@ -2,7 +2,9 @@ import logging
 from typing import Optional
 
 from examples.GameServer.game_modules.game_dataaccess.PostgresqlModule import PostgresqlModule
-from examples.GameServer.game_modules.game_dataaccess.dbtable.db_info import DBInfo
+
+from examples.GameServer.game_modules.game_dataaccess.dbtable.DataGameUser import DataGameUser
+from examples.GameServer.game_modules.game_dataaccess.dbtable.db_Inbox import DBInbox
 from examples.GameServer.game_modules.game_dataaccess.dbtable.db_role import DBRole
 from examples.GameServer.game_modules.game_dataaccess.dbtable.db_user import DBUser
 from pkg.logger import logger
@@ -18,6 +20,11 @@ from pkg.ymd_dataaccess.ymd_redis.redis_client import RedisInfo
 class DataAccessManager:
     _instance:DataAccessManager | None = None
 
+    redisModule: RedisModule = None
+    postgresqlModule: PostgresqlModule = None
+    mysqlModule: MysqlModule = None
+    dataAccess: YmdDataAccessBase = None
+
     def __new__(cls) -> DataAccessManager:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
@@ -27,14 +34,6 @@ class DataAccessManager:
         if hasattr(self, '_initialized'):
             return
         self._initialized = True
-
-        self.redisModule: Optional[RedisModule] = None
-        self.postgresqlModule: Optional[PostgresqlModule] = None
-        self.mysqlModule: Optional[MysqlModule] = None
-
-        self.dataAccess: Optional[YmdDataAccessBase] = None
-
-        self.is_initialized = False
 
     def initialize(self) -> None:
         """Initialize all data access modules"""
@@ -66,21 +65,28 @@ class DataAccessManager:
             # Initialize YmdDataAccessBase
             self.dataAccess = YmdDataAccessBase(info)
             # 注册表自动迁移 创建表结构
-            self.dataAccess.AutoMigrate(DBUser,DBRole,DBInfo)
+            self.dataAccess.AutoMigrate(DBUser,DBRole,DBInbox)
 
             self.dataAccess.Connect()
             # Initialize specific modules
             self.redisModule = RedisModule(self.dataAccess)
             self.postgresqlModule = PostgresqlModule(self.dataAccess)
             #self.mysqlModule = MysqlModule(self.dataAccess)
-
-            self.is_initialized = True
             logger.Log.Info("DataAccessManager initialized successfully")
 
         except Exception as e:
             logger.Log.Error(f"DataAccessManager initialization failed: {e}")
             raise
-    #获取玩家
-    def GetDataGameUser(self,userId:int):
+    #获取玩家数据
+    def GetDataGameUser(self,userId:int)->DataGameUser:
+            data,err = self.redisModule.GetDataGameUser(userId)
+            if err!=None:
+                logger.Log.Error(f"DataAccessManager get data game user failed with error: {err}")
+                return None
 
-        pass
+            if data is None:
+                data,err = self.postgresqlModule.GetDataGameUser(userId)
+                if err!=None:
+                    logger.Log.Error(f"DataAccessManager get data game user failed with error: {err}")
+
+            return data

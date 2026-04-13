@@ -7,6 +7,7 @@ class DataGameUser:
     def __init__(self,user_id:int):
         self.user_id = user_id
         self.DBRole:DBRole
+        self.DBInbox:DBInbox
 
 
 def NewDataGameUser(userId:int):

@@ -6,3 +6,5 @@ class PostgresqlModule:
         self.dataAccess = dataAccess
         self._pg = dataAccess.get_postgresql()
 
+    def GetDataGameUser(self,userId:int):
+        self.dataAccess.get_postgresql()
