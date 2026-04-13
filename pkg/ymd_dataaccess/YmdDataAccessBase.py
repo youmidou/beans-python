@@ -1,29 +1,32 @@
 from dataclasses import dataclass
-from typing import Optional, Any
+from typing import Optional
 
+from pkg.logger import logger
 from pkg.ymd_dataaccess.ymd_mysql.mysql_client import MysqlClient, MysqlInfo
+from pkg.ymd_dataaccess.ymd_postgresql.postgresql_client import PostgresqlInfo, PostgresqlClient
 from pkg.ymd_dataaccess.ymd_redis.redis_client import RedisClient, RedisInfo
 
 
 @dataclass
 class DataAccessInfo:
+    postgresql_info: PostgresqlInfo = None
     mysql_info: MysqlInfo = None
     redis_info: RedisInfo = None
-    def __init__(self, mysql_info: MysqlInfo = None, redis_info: RedisInfo = None) -> None:
-        self.mysql_info = mysql_info
-        self.redis_info = redis_info
-
 
 
 class YmdDataAccessBase:
+    _postgresql: PostgresqlClient = None
     _mysql: MysqlClient = None
     _redis: RedisClient = None
     def __init__(self, info: DataAccessInfo):
         self._info = info
-        self._mysql: MysqlClient = None
-        self._redis: RedisClient = None
 
-    def Connect(self) -> None:
+    def init(self) -> None:
+        logger.Log.info("YmdDataAccessBase.__init__")
+        if self._info.postgresql_info is not None:
+            self._postgresql = PostgresqlClient(self._info.postgresql_info)
+            self._postgresql.connect()
+
         if self._info.mysql_info is not None:
             self._mysql = MysqlClient(self._info.mysql_info)
             self._mysql.connect()
@@ -32,17 +35,20 @@ class YmdDataAccessBase:
             self._redis = RedisClient(self._info.redis_info)
             self._redis.connect()
 
-    def AutoMigrate(self, *models_or_bases: Any) -> None:
-        self._mysql.AutoMigrate(*models_or_bases)
-        self._redis.AutoMigrate(*models_or_bases)
+    def get_postgresql(self) -> Optional[PostgresqlClient]:
+        return self._postgresql
 
-    def get_mysql(self) -> MysqlClient:
+    def get_mysql(self) -> Optional[MysqlClient]:
         return self._mysql
 
-    def get_redis(self) -> RedisClient:
+    def get_redis(self) -> Optional[RedisClient]:
         return self._redis
 
     def close(self) -> None:
+        if self._postgresql:
+            self._postgresql.close()
+            self._postgresql = None
+
         if self._mysql:
             self._mysql.close()
             self._mysql = None

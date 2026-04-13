@@ -1,5 +1,5 @@
 import redis
-from typing import Optional, Any
+from typing import Optional
 from dataclasses import dataclass, field
 
 
@@ -39,9 +39,6 @@ class RedisClient:
         if self._client is None:
             raise RuntimeError("RedisClient not connected. Call connect() first.")
         return self._client
-
-    def AutoMigrate(self, *models_or_bases: Any) -> None:
-        pass
 
     def close(self) -> None:
         if self._client:
