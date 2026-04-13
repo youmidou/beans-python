@@ -27,10 +27,13 @@ class DataAccessManager:
         if hasattr(self, '_initialized'):
             return
         self._initialized = True
-        self.logger = logging.getLogger(__name__)
-        self.dataAccess: Optional[YmdDataAccessBase] = None
-        self.mysqlModule: Optional[MysqlModule] = None
+
         self.redisModule: Optional[RedisModule] = None
+        self.postgresqlModule: Optional[PostgresqlModule] = None
+        self.mysqlModule: Optional[MysqlModule] = None
+
+        self.dataAccess: Optional[YmdDataAccessBase] = None
+
         self.is_initialized = False
 
     def initialize(self) -> None:
@@ -67,9 +70,9 @@ class DataAccessManager:
 
             self.dataAccess.Connect()
             # Initialize specific modules
-            self.mysqlModule = MysqlModule(self.dataAccess)
             self.redisModule = RedisModule(self.dataAccess)
             self.postgresqlModule = PostgresqlModule(self.dataAccess)
+            #self.mysqlModule = MysqlModule(self.dataAccess)
 
             self.is_initialized = True
             logger.Log.Info("DataAccessManager initialized successfully")
